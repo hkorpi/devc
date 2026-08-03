@@ -25,8 +25,8 @@ function read_label () {
 function required () {
   local value=$1
   if [[ -z "${value:-}" ]]; then
-      echo "$2" >&2
-      exit 1
+      echo "Error: $2" >&2
+      return 1
       else echo "$value"
   fi
 }
@@ -38,27 +38,30 @@ function configure {
   local name=$(required $1 "Development name is missing.")
   local module="$(basename $(pwd))"
   local image_name="$name-dev"
+  local workspace
+  local ports
+  local network
 
   echo "Root: $root"
   echo "Image name: $image_name"
   echo "Module: $module"
   docker build --file "$root/dev.dockerfile" --tag "$image_name" "$root"
 
-  local workspace=$(required \
+  workspace=$(required \
     $(realpath -m "$root"/$(read_label $module 'workspace' "$image_name")) \
     "Define workspace in dockerfile using dev.workspace label")
   echo "Workspace: $workspace"
 
-  local ports=$(read_label $module 'ports' "$image_name")
+  ports=$(read_label $module 'ports' "$image_name")
   echo "Exposed (localhost) ports: $ports"
 
-  local user=$(required \
+  user=$(required \
       $(docker image inspect --format='{{index .Config.User}}' "$image_name") \
       "Define user in dockerfile using user statement")
   echo "User: $user"
 
-  local network=$(required \
-    $(read_label $module 'network' "$image_name") \
+  network=$(required \
+    "$(read_label $module 'network' "$image_name")" \
     "Define network in dockerfile using dev.network label")
   echo "Connect to network: $network"
 
