@@ -3,4 +3,4 @@ definition=$(mktemp)
 
 $(dirname $0)/setup "$1" "$definition" && source "$definition"
 
-rm "$definition"
+rm -f "$definition"
