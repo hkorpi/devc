@@ -52,7 +52,9 @@ function configure {
   local ports=$(read_label $module 'ports' "$image_name")
   echo "Exposed ports: $ports"
 
-  local user=$(docker image inspect --format='{{index .Config.User}}' "$image_name")
+  local user=$(required \
+      $(docker image inspect --format='{{index .Config.User}}' "$image_name") \
+      "Define user in dockerfile using user statement")
   echo "User: $user"
 
   local network=$(read_label $module 'network' "$image_name")
