@@ -41,6 +41,7 @@ function configure {
   local workspace
   local ports
   local network
+  local docker_opts=( )
 
   echo "Root: $root"
   echo "Image name: $image_name"
@@ -54,6 +55,10 @@ function configure {
 
   ports=$(read_label $module 'ports' "$image_name")
   echo "Exposed (localhost) ports: $ports"
+  IFS=, read -ra port_list <<< "$ports"
+  for port in "${port_list[@]}"; do
+    docker_opts+=( -p "127.0.0.1:${port}:${port}" )
+  done
 
   user=$(required \
       $(docker image inspect --format='{{index .Config.User}}' "$image_name") \
@@ -76,7 +81,8 @@ function configure {
   IFS=, read -ra fnames <<< "$(read_label $module 'cmds' "$image_name")"
   for fn in "${fnames[@]}"; do
     printf -v def '%s() { %s %s %s %s %s %s %s %s "$@" }' "$fn" "$run_dir/run" \
-      "$ports" "$network" "$user" "$workspace" "$dev_options" \
+      "$network" "$user" "$workspace" \
+      "${docker_opts[*]}" "$dev_options" \
       "$image_name" "$fn"
     echo "$def" >> $2
   done
