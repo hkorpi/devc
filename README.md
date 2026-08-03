@@ -1,34 +1,39 @@
-Development tools container
-===
+# Development Tools Container
 
-Put your development tools to an application container and use them like any other command line tool in your environment.
+Run your development tools inside a dedicated container and use them as if they were native command-line tools in your local environment.
 
-Benefits
-- Security - Node/python/etc worms can only access to the resources you explicitly mount to the container
-- Network - CLI tools can now work in the same network as your development services defined with docker compose
+## Benefits
 
-Usage
----
+* **Security** – Node.js, Python, and other tools are isolated inside the container. They can access only the files and resources that you explicitly mount.
+* **Networking** – CLI tools can communicate over the same Docker network as your development services defined with Docker Compose.
 
-Define you development tools in using 
-- **dev.dockerfile** A dockerfile which defines an image containing tools and specifications how to run them
-- **dev.options** Extra docker run options - how to run these tools in your local environment e.g. mount user home and other resources like maven repositories
+## Usage
 
-Add defined commands to your shell environment:
-```
+Define your development environment using the following files:
+
+* **`dev.dockerfile`** – A Dockerfile that builds an image containing your development tools and specifies how they should be run.
+* **`dev.options`** – Additional `docker run` options for your local environment, such as mounting your home directory, Maven repository, or other resources.
+
+Add the defined commands to your shell environment:
+
+```sh
 source init <name>
 ```
 
-Example
----
+## Example
 
-Here is a simple example to get node command to your shell environment.
-```
-echo 'FROM node
+The following example makes the `node` command available in your shell:
+
+```sh
+cat > dev.dockerfile <<'EOF'
+FROM node
 USER node
 LABEL dev.network="none"
-LABEL dev.cmds="node"' > 'dev.dockerfile'
+LABEL dev.cmds="node"
+EOF
+
 source init test
 node --version
 ```
-Here node command does not have any network access and can only access current directory.
+
+In this example, the `node` command has no network access and can access only the current working directory.
