@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -eu
+
+ports=$1
+network=$2
+user=$3
+workspace=$4
+
+docker_opts=( --rm --init --read-only --cap-drop ALL --security-opt "no-new-privileges=true" )
+
+if [ -t 0 ] && [ -t 1 ]; then
+  docker_opts+=( -it )
+fi
+
+IFS=, read -ra port_list <<< "$ports"
+for port in "${port_list[@]}"; do
+  docker_opts+=( -p "127.0.0.1:${port}:${port}" )
+done
+
+docker run "${docker_opts[@]}" \
+  --network="${network}" \
+  --workdir "/home/${user}/workspace/$(realpath --relative-to="${workspace}" "$(pwd)")" \
+  --mount type=bind,src=$(realpath "${workspace}"),dst="/home/${user}/workspace" \
+  "${@:5}"

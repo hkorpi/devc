@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -eu
+
+function find_dir {
+  local dir="$1"
+  local file="$2"
+  while [[ "$dir" != "/" ]]; do
+      if [[ -f "$dir/$file" ]]; then
+          echo "$dir"
+          break
+      fi
+      dir="$(dirname "$dir")"
+  done
+}
+
+function read_label () {
+  local module=$1
+  local name=$2
+  local image_name=$3
+  local default_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$name\"}}" "$image_name")
+  local module_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$module.$name\"}}" "$image_name")
+  echo ${module_value:-$default_value}
+}
+
+function required () {
+  local value=$1
+  if [[ -z "${value:-}" ]]; then
+      echo "$2" >&2
+      exit 1
+      else echo "$value"
+  fi
+}
+
+function configure {
+  local root=$(required \
+    $(find_dir $(pwd) 'dev.dockerfile') \
+    "Development tools (dev.dockerfile) not found in current or any parent directory.")
+  local name=$(required $1 "Development name is missing.")
+  local module="$(basename $(pwd))"
+  local image_name="$name-dev"
+
+  echo "Root: $root"
+  echo "Image name: $image_name"
+  echo "Module: $module"
+  docker build --file "$root/dev.dockerfile" --tag "$image_name" "$root"
+
+  local workspace=$(required \
+    $(realpath -m "$root"/$(read_label $module 'workspace' "$image_name")) \
+    "Define workspace in dockerfile using dev.workspace label")
+  echo "Workspace: $workspace"
+
+  local ports=$(read_label $module 'ports' "$image_name")
+  echo "Exposed ports: $ports"
+
+  local user=$(docker image inspect --format='{{index .Config.User}}' "$image_name")
+  echo "User: $user"
+
+  local network=$(read_label $module 'network' "$image_name")
+  echo "Connect to network: $network"
+
+  options_dir=$(find_dir $(pwd) 'dev.options')
+  if [[ -z "${options_dir:-}" ]]; then dev_options=''
+    else dev_options=$(cat "$options_dir/dev.options" | paste -sd ' ')
+  fi
+  echo "Other docker options: $dev_options"
+
+  # generate functions
+  local run_dir=$(dirname $0)
+  IFS=, read -ra fnames <<< "$(read_label $module 'cmds' "$image_name")"
+  for fn in "${fnames[@]}"; do
+    printf -v def '%s() { %s %s %s %s %s %s %s %s "$@" }' "$fn" "$run_dir/run" \
+      "$ports" "$network" "$user" "$workspace" "$dev_options" \
+      "$image_name" "$fn"
+    echo "$def" >> $2
+  done
+}
+
+configure $1 $2
