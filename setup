@@ -50,14 +50,16 @@ function configure {
   echo "Workspace: $workspace"
 
   local ports=$(read_label $module 'ports' "$image_name")
-  echo "Exposed ports: $ports"
+  echo "Exposed (localhost) ports: $ports"
 
   local user=$(required \
       $(docker image inspect --format='{{index .Config.User}}' "$image_name") \
       "Define user in dockerfile using user statement")
   echo "User: $user"
 
-  local network=$(read_label $module 'network' "$image_name")
+  local network=$(required \
+    $(read_label $module 'network' "$image_name") \
+    "Define network in dockerfile using dev.network label")
   echo "Connect to network: $network"
 
   options_dir=$(find_dir $(pwd) 'dev.options')
