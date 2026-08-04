@@ -40,6 +40,7 @@ function configure {
   local image_name="$name-dev"
   local workspace
   local ports
+  local environment
   local network
   local docker_opts=( )
 
@@ -58,6 +59,13 @@ function configure {
   IFS=, read -ra port_list <<< "$ports"
   for port in "${port_list[@]}"; do
     docker_opts+=( -p "127.0.0.1:${port}:${port}" )
+  done
+
+  environment=$(read_label $module 'env' "$image_name")
+  echo "Environment variables: $environment"
+  IFS=, read -ra environment_list <<< "$environment"
+  for env_var in "${environment_list[@]}"; do
+    docker_opts+=( --env "$env_var"'="$'"$env_var"'"' )
   done
 
   user=$(required \
