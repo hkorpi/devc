@@ -28,6 +28,12 @@ The development container is defined using a standard Dockerfile, as described i
 
 In addition to the standard Dockerfile instructions, `devc` recognizes the following instructions and labels to configure the runtime environment:
 
+* **Commands**
+  ```dockerfile
+  LABEL dev.cmds=<cmd1>,<cmd2>,...
+  ```
+  A comma-separated list of commands which are exported to your shell environment from the container. A command must be executable inside the container.
+
 * **Network**
   ```dockerfile
   LABEL dev.network=<network>
