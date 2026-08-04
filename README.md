@@ -20,7 +20,7 @@ Add the defined commands to your shell environment:
 source init <name>
 ```
 
-This name is used for docker image: <name>-dev
+This name is used for docker image: `<name>-dev`
 
 ### Dockerfile
 
@@ -51,10 +51,11 @@ In addition to the standard Dockerfile instructions, `devc` recognizes the follo
   LABEL dev.workspace=<workspace>
   ```
   Specifies the workspace directory relative to the location of `dev.dockerfile`. This directory is mounted into the container at:
-
   ```
   /home/<user>/workspace
   ```
+  The container working directory is your current directory inside this workspace. 
+  Default workspace is '.' so default workspace directory is same where the dev.dockerfile is located.
 
 * **Ports**
 
