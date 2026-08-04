@@ -1,6 +1,13 @@
 
-definition=$(mktemp)
+definition=$(mktemp) || return 1
 
-$(dirname $0)/setup "$1" "$definition" && source "$definition"
+exit_status=0
+if "$1/setup" "$2" "$definition"; then
+    . "$definition"
+    exit_status=$?
+else
+    exit_status=$?
+fi
 
 rm -f "$definition"
+return "$exit_status"

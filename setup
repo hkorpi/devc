@@ -80,7 +80,7 @@ function configure {
   local run_dir=$(dirname $0)
   IFS=, read -ra fnames <<< "$(read_label $module 'cmds' "$image_name")"
   for fn in "${fnames[@]}"; do
-    printf -v def '%s() { %s %s %s %s %s %s %s %s "$@" }' "$fn" "$run_dir/run" \
+    printf -v def '%s() { %s %s %s %s %s %s %s %s "$@"; }' "$fn" "$run_dir/run" \
       "$network" "$user" "$workspace" \
       "${docker_opts[*]}" "$dev_options" \
       "$image_name" "$fn"

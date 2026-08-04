@@ -7,6 +7,15 @@ Run your development tools inside a dedicated container and use them as if they 
 * **Security** – Node.js, Python, and other tools are isolated inside the container. They can access only the files and resources that you explicitly mount.
 * **Networking** – CLI tools can communicate over the same Docker network as your development services defined with Docker Compose.
 
+## Installation
+
+Clone the repository to any location on your machine:
+```sh
+git clone https://github.com/hkorpi/devc.git
+```
+Throughout this documentation, the directory where the repository is cloned is referred to as `<devc-path>`.
+
+
 ## Usage
 
 Define your development environment using the following files:
@@ -17,11 +26,12 @@ Define your development environment using the following files:
 Add the defined commands to your shell environment:
 
 ```sh
-source init <name>
+. <devc-path>/init <devc-path> <name>
 ```
 
 This builds a docker image: `<name>-dev` and adds commands defined in the dockerfile to your shell environment. 
-The commands are sourced as posix compliant functions. The command function executes (`docker run`) the original command inside the container 
+The commands are sourced as posix compliant functions. 
+The command function executes (`docker run`) the original command inside the container 
 using runtime options interpreted from `dev.dockerfile` and directly from `dev.options`.
 
 ### Dockerfile
