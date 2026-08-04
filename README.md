@@ -20,7 +20,9 @@ Add the defined commands to your shell environment:
 source init <name>
 ```
 
-This name is used for docker image: `<name>-dev`
+This builds a docker image: `<name>-dev` and adds commands defined in the dockerfile to your shell environment. 
+The commands are sourced as posix compliant functions. The command function executes (`docker run`) the original command inside the container 
+using runtime options interpret from `dev.dockerfile` and from `dev.options`.
 
 ### Dockerfile
 
