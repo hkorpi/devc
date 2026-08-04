@@ -20,6 +20,44 @@ Add the defined commands to your shell environment:
 source init <name>
 ```
 
+This name is used for docker image: <name>-dev
+
+### Dockerfile
+
+The development container is defined using a standard Dockerfile, as described in the [Dockerfile reference](https://docs.docker.com/reference/dockerfile/).
+
+In addition to the standard Dockerfile instructions, `devc` recognizes the following instructions and labels to configure the runtime environment:
+
+* **Network**
+  ```dockerfile
+  LABEL dev.network=<network>
+  ```
+  Connects the container to the specified Docker network.
+
+* **User**
+  ```dockerfile
+  USER <user>
+  ```
+  Specifies the user that commands will run as inside the container.
+
+* **Workspace**
+  ```dockerfile
+  LABEL dev.workspace=<workspace>
+  ```
+  Specifies the workspace directory relative to the location of `dev.dockerfile`. This directory is mounted into the container at:
+
+  ```
+  /home/<user>/workspace
+  ```
+
+* **Ports**
+
+  ```dockerfile
+  LABEL dev.ports=<port1>,<port2>,...
+  ```
+  A comma-separated list of container ports to expose on `localhost`. Each listed port is published from the container to the same port on the host.
+
+
 ## Example
 
 The following example makes the `node` command available in your shell:
