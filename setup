@@ -14,16 +14,16 @@ function find_dir {
 }
 
 function read_label () {
-  local module=$1
-  local name=$2
-  local image_name=$3
+  local module="$1"
+  local name="$2"
+  local image_name="$3"
   local default_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$name\"}}" "$image_name")
   local module_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$module.$name\"}}" "$image_name")
   echo "${module_value:-$default_value}"
 }
 
 function required () {
-  local value=$1
+  local value="$1"
   if [[ -z "${value:-}" ]]; then
       echo "Error: $2" >&2
       return 1
@@ -35,7 +35,7 @@ function configure {
   local root=$(required \
     $(find_dir $(pwd) 'dev.dockerfile') \
     "Development tools (dev.dockerfile) not found in current or any parent directory.")
-  local name=$(required $1 "Development name is missing.")
+  local name=$(required "$1" "Development name is missing.")
   local module="$(basename $(pwd))"
   local image_name="$name-dev"
   local workspace
@@ -92,8 +92,8 @@ function configure {
       "$network" "$user" "$workspace" \
       "${docker_opts[*]}" "$dev_options" \
       "$image_name" "$fn"
-    echo "$def" >> $2
+    echo "$def" >> "$2"
   done
 }
 
-configure $1 $2
+configure "$1" "$2"
