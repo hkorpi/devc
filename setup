@@ -19,7 +19,7 @@ function read_label () {
   local image_name=$3
   local default_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$name\"}}" "$image_name")
   local module_value=$(docker image inspect --format="{{index .Config.Labels \"dev.$module.$name\"}}" "$image_name")
-  echo ${module_value:-$default_value}
+  echo "${module_value:-$default_value}"
 }
 
 function required () {
