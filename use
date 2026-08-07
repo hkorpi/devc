@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -eu
 
-devc_dir=$(dirname $0)
-echo '.' "$(dirname $0)/init" "$(dirname $0)" "$1"
+devc_path=$(dirname $0)
+echo '.' "$devc_path/init" "$devc_path" "$1"
