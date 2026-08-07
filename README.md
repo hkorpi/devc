@@ -26,7 +26,7 @@ Define your development environment using the following files:
 Add the defined commands to your shell environment:
 
 ```sh
-. <devc-path>/init <devc-path> <name>
+eval $(<devc-path>/use <name>)
 ```
 
 This builds a docker image: `<name>-dev` and adds commands defined in the dockerfile to your shell environment. 
@@ -89,7 +89,7 @@ LABEL dev.network="none"
 LABEL dev.cmds="node"
 EOF
 
-source init test
+eval $(use test)
 node --version
 ```
 
