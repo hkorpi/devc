@@ -89,7 +89,7 @@ LABEL dev.network="none"
 LABEL dev.cmds="node"
 EOF
 
-eval $(use test)
+eval $(./use test)
 node --version
 ```
 
